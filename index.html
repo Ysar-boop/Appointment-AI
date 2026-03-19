@@ -1,8 +1,14 @@
+ode:
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Appointment AI Assistant</title>
+
+  <!-- Tesseract.js for OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,22 +18,11 @@
       padding: 40px;
     }
 
-    h1 {
-      margin-bottom: 10px;
-    }
+    h1 { margin-bottom: 10px; }
 
-    .container {
-      max-width: 500px;
-      margin: auto;
-    }
+    .container { max-width: 500px; margin: auto; }
 
-    input {
-      width: 80%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      margin-top: 15px;
-    }
+    input, .file-upload { width: 80%; padding: 10px; border-radius: 8px; border: none; margin-top: 15px; }
 
     button {
       padding: 10px 20px;
@@ -39,9 +34,7 @@
       margin-top: 10px;
     }
 
-    button:hover {
-      background: #2563EB;
-    }
+    button:hover { background: #2563EB; }
 
     #output {
       margin-top: 20px;
@@ -51,7 +44,6 @@
       min-height: 60px;
     }
 
-    /* Add Q&A panel styles */
     .add-qna {
       margin-top: 30px;
       border-top: 1px solid #ccc;
@@ -62,13 +54,7 @@
       padding: 15px;
     }
 
-    .add-qna input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
+    .add-qna input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
 
     .add-qna button {
       margin-top: 10px;
@@ -76,20 +62,25 @@
       background: #10B981;
     }
 
-    .add-qna button:hover {
-      background: #059669;
-    }
+    .add-qna button:hover { background: #059669; }
+
+    #imageUpload { margin-top: 15px; }
   </style>
 </head>
-<body>
 
+<body>
 <div class="container">
   <h1>Appointment AI</h1>
   <p>Your AI helper is ready to assist with appointments.</p>
 
+  <!-- Text input -->
   <input type="text" id="userInput" placeholder="Type customer message here..." />
   <br>
   <button onclick="handleSubmit()">Submit</button>
+
+  <!-- Screenshot input -->
+  <input type="file" id="imageUpload" accept="image/*">
+  <button onclick="handleImage()">Upload Screenshot</button>
 
   <div id="output">Response will appear here...</div>
 
@@ -126,14 +117,14 @@
     return "Got it! Can you tell me a bit more so I can assist you better?";
   }
 
-  // Handle submit
+  // Handle text input submit
   function handleSubmit() {
     const input = document.getElementById("userInput").value;
     const response = getResponse(input);
     document.getElementById("output").innerText = response;
   }
 
-  // Add Q&A dynamically from panel
+  // Handle Add Q&A panel
   const addQBtn = document.getElementById('add-qna-btn');
   const newQ = document.querySelector('.new-q');
   const newA = document.querySelector('.new-a');
@@ -150,7 +141,28 @@
       alert("Please fill both keywords and answer.");
     }
   });
-</script>
 
+  // Handle screenshot upload and OCR
+  function handleImage() {
+    const file = document.getElementById('imageUpload').files[0];
+    if (!file) {
+      alert("Please select an image first.");
+      return;
+    }
+
+    document.getElementById('output').innerText = "Reading screenshot...";
+
+    Tesseract.recognize(
+      file,
+      'eng',
+      { logger: m => console.log(m) }
+    ).then(({ data: { text } }) => {
+      const response = getResponse(text);
+      document.getElementById('output').innerText = "Detected text: " + text + "\n\nAI Response: " + response;
+    }).catch(err => {
+      document.getElementById('output').innerText = "Error reading image: " + err;
+    });
+  }
+</script>
 </body>
 </html>
