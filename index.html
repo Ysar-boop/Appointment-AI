@@ -1,91 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment AI</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            color: #333;
-        }
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
-        }
-        h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        p {
-            font-size: 20px;
-            color: #555;
-        }
-        input[type="text"] {
-            width: 80%;
-            padding: 10px;
-            margin-top: 20px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            border-radius: 6px;
-            border: none;
-            background-color: #2c3e50;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1b2a3a;
-        }
-        #response {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #2c3e50;
-            min-height: 24px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Appointment AI Assistant</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0F172A;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+    }
+
+    input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 15px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #3B82F6;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: #2563EB;
+    }
+
+    #output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1E293B;
+      border-radius: 10px;
+      min-height: 60px;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Welcome to Appointment AI!</h1>
-        <p>Your AI helper is ready to assist with appointments.</p>
-        
-        <input type="text" id="user-input" placeholder="Type your request here..." />
-        <button id="submit-btn">Submit</button>
-        <div id="response"></div>
-    </div>
 
-    <script>
-        // Placeholder JavaScript for AI interaction
-        const input = document.getElementById('user-input');
-        const btn = document.getElementById('submit-btn');
-        const response = document.getElementById('response');
+  <div class="container">
+    <h1>Appointment AI</h1>
+    <p>Your AI helper is ready to assist with appointments.</p>
 
-        btn.addEventListener('click', () => {
-            const text = input.value.trim();
-            if(text) {
-                response.textContent = `You typed: "${text}". AI response will appear here.`;
-                input.value = '';
-            } else {
-                response.textContent = 'Please type a request first.';
-            }
-        });
-    </script>
+    <input type="text" id="userInput" placeholder="Type customer message here..." />
+    <br>
+    <button onclick="handleSubmit()">Submit</button>
+
+    <div id="output">Response will appear here...</div>
+  </div>
+
+  <script>
+    const knowledgeBase = [
+      {
+        keywords: ["price", "cost", "how much"],
+        response: "Our service helps improve your Google visibility and bring more customers. Pricing depends on your business needs, but I can connect you with a specialist to go over options."
+      },
+      {
+        keywords: ["not interested", "no thanks"],
+        response: "Totally understand! Just curious—are you currently getting consistent leads from Google, or is that something you're still looking to improve?"
+      },
+      {
+        keywords: ["busy", "call later"],
+        response: "No problem! When would be a better time for a quick call? It’ll only take a minute."
+      },
+      {
+        keywords: ["what is this", "who are you"],
+        response: "We help local businesses improve their Google presence so they can get more calls and customers. I just wanted to quickly see if this is something you’d be open to."
+      },
+      {
+        keywords: ["already have", "we have marketing"],
+        response: "That’s great! Most of the businesses we work with already have marketing, we just help improve their Google results. Would you be open to seeing if there’s anything we can improve?"
+      },
+      {
+        keywords: ["send info", "email me"],
+        response: "I can definitely send more info, but most business owners prefer a quick call so they can ask questions directly. Would a short call work for you?"
+      }
+    ];
+
+    function getResponse(input) {
+      input = input.toLowerCase();
+
+      for (let item of knowledgeBase) {
+        for (let keyword of item.keywords) {
+          if (input.includes(keyword)) {
+            return item.response;
+          }
+        }
+      }
+
+      return "Got it! Can you tell me a bit more so I can assist you better?";
+    }
+
+    function handleSubmit() {
+      const input = document.getElementById("userInput").value;
+      const response = getResponse(input);
+
+      document.getElementById("output").innerText = response;
+    }
+  </script>
+
 </body>
 </html>
