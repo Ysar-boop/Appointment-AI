@@ -32,7 +32,7 @@
             font-size: 20px;
             color: #555;
         }
-        #ai-input {
+        input[type="text"] {
             width: 80%;
             padding: 10px;
             margin-top: 20px;
@@ -40,7 +40,7 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
-        #ai-btn {
+        button {
             padding: 10px 20px;
             margin-top: 10px;
             border-radius: 6px;
@@ -50,13 +50,14 @@
             font-size: 16px;
             cursor: pointer;
         }
-        #ai-btn:hover {
+        button:hover {
             background-color: #1b2a3a;
         }
-        #ai-response {
+        #response {
             margin-top: 20px;
             font-size: 18px;
             color: #2c3e50;
+            min-height: 24px;
         }
     </style>
 </head>
@@ -65,25 +66,24 @@
         <h1>Welcome to Appointment AI!</h1>
         <p>Your AI helper is ready to assist with appointments.</p>
         
-        <!-- AI Input Section -->
-        <input type="text" id="ai-input" placeholder="Type your request here..." />
-        <button id="ai-btn">Submit</button>
-        <div id="ai-response"></div>
+        <input type="text" id="user-input" placeholder="Type your request here..." />
+        <button id="submit-btn">Submit</button>
+        <div id="response"></div>
     </div>
 
     <script>
-        // Placeholder JS for your AI helper
-        const input = document.getElementById('ai-input');
-        const btn = document.getElementById('ai-btn');
-        const response = document.getElementById('ai-response');
+        // Placeholder JavaScript for AI interaction
+        const input = document.getElementById('user-input');
+        const btn = document.getElementById('submit-btn');
+        const response = document.getElementById('response');
 
         btn.addEventListener('click', () => {
-            const userText = input.value.trim();
-            if(userText) {
-                response.textContent = `You asked: "${userText}" — AI will respond here.`;
+            const text = input.value.trim();
+            if(text) {
+                response.textContent = `You typed: "${text}". AI response will appear here.`;
                 input.value = '';
             } else {
-                response.textContent = 'Please type something first.';
+                response.textContent = 'Please type a request first.';
             }
         });
     </script>
