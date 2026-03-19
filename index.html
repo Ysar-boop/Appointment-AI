@@ -26,7 +26,6 @@
 
   h1 { text-align:center; margin-bottom:10px; color:#F87171; }
 
-  /* Panels */
   .panel {
     border-radius: 12px;
     padding: 20px;
@@ -36,7 +35,6 @@
   .panel-light { background:#F3F4F6; color:#111; }
   .panel-dark { background:#1E293B; color:white; }
 
-  /* Input fields */
   input[type="text"], textarea {
     width: 100%;
     padding: 12px;
@@ -47,7 +45,6 @@
     font-size: 14px;
   }
 
-  /* Buttons */
   button {
     padding: 12px 20px;
     border-radius: 8px;
@@ -71,7 +68,6 @@
   .btn-yellow { background:#FACC15; color:#111; }
   .btn-yellow:hover { background:#EAB308; }
 
-  /* Output box */
   #output {
     background:#111827;
     border-radius:12px;
@@ -81,10 +77,8 @@
     color:#F9FAFB;
   }
 
-  /* Shortcut buttons */
   .shortcuts { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; }
 
-  /* Q&A Entries */
   .qa-entry {
     display:flex;
     justify-content:space-between;
@@ -143,6 +137,7 @@
 </div>
 
 <script>
+// Knowledge Base
 let knowledgeBase = [
   { keywords:["price","cost","how much"], response:"Our service improves your Google visibility. Pricing depends on needs; I can connect you with a specialist." },
   { keywords:["not interested","no thanks"], response:"Totally understand! Are you getting consistent leads from Google?" },
@@ -215,20 +210,42 @@ document.getElementById('addQBtn').addEventListener('click',()=>{
   } else alert("Please fill both keywords and answer.");
 });
 
-// Screenshot paste-to-OCR
-document.addEventListener('paste',async (event)=>{
-  const items=event.clipboardData.items;
-  for(let i=0;i<items.length;i++){
-    if(items[i].type.indexOf("image")!==-1){
-      const blob=items[i].getAsFile();
-      document.getElementById("output").innerText="Reading screenshot...";
-      try{
-        const { data:{ text } } = await Tesseract.recognize(blob,'eng');
-        const response=getResponse(text);
-        document.getElementById("output").innerText="Detected text: "+text+"\n\nAI Response: "+response;
-      }catch(err){ document.getElementById("output").innerText="Error reading image: "+err; }
+// Screenshot paste-to-OCR (robust version)
+document.addEventListener('paste', async (event) => {
+    const clipboardItems = event.clipboardData.items || [];
+    let foundImage = false;
+
+    for (let item of clipboardItems) {
+        if (item.type.indexOf("image") !== -1) {
+            foundImage = true;
+            const blob = item.getAsFile();
+            document.getElementById("output").innerText = "Reading screenshot...";
+            try {
+                const { data: { text } } = await Tesseract.recognize(blob, 'eng');
+                const response = getResponse(text);
+                document.getElementById("output").innerText =
+                  "Detected text: " + text + "\n\nAI Response: " + response;
+            } catch (err) {
+                document.getElementById("output").innerText = "Error reading image: " + err;
+            }
+        }
     }
-  }
+
+    // fallback for some browsers
+    if (!foundImage && event.clipboardData.files.length > 0) {
+        const file = event.clipboardData.files[0];
+        if (file.type.startsWith("image")) {
+            document.getElementById("output").innerText = "Reading screenshot...";
+            try {
+                const { data: { text } } = await Tesseract.recognize(file, 'eng');
+                const response = getResponse(text);
+                document.getElementById("output").innerText =
+                    "Detected text: " + text + "\n\nAI Response: " + response;
+            } catch(err) {
+                document.getElementById("output").innerText = "Error reading image: " + err;
+            }
+        }
+    }
 });
 
 // Initialize Q&A manage panel
