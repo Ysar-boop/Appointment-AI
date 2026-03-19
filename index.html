@@ -1,168 +1,253 @@
-ode:
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Appointment AI Assistant</title>
-
-  <!-- Tesseract.js for OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 
   <style>
+    /* ===== Body & Fonts ===== */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #0F172A;
       color: white;
-      text-align: center;
-      padding: 40px;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
     }
 
-    h1 { margin-bottom: 10px; }
+    .container {
+      width: 900px;
+      max-width: 95%;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-    .container { max-width: 500px; margin: auto; }
+    h1 { margin-bottom: 10px; text-align: center; }
 
-    input, .file-upload { width: 80%; padding: 10px; border-radius: 8px; border: none; margin-top: 15px; }
+    /* ===== Panels ===== */
+    .panel {
+      background: #f3f4f6;
+      color: #111;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    }
+
+    .panel h3 { margin-top: 0; }
+
+    /* ===== Inputs & Buttons ===== */
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 8px;
+      box-sizing: border-box;
+      font-size: 14px;
+    }
 
     button {
-      padding: 10px 20px;
-      border: none;
+      padding: 12px 20px;
       border-radius: 8px;
+      border: none;
       background: #3B82F6;
       color: white;
       cursor: pointer;
+      font-size: 14px;
       margin-top: 10px;
+      transition: all 0.2s;
     }
 
     button:hover { background: #2563EB; }
 
+    /* ===== Output Display ===== */
     #output {
-      margin-top: 20px;
-      padding: 15px;
       background: #1E293B;
-      border-radius: 10px;
-      min-height: 60px;
+      border-radius: 12px;
+      padding: 20px;
+      min-height: 100px;
+      white-space: pre-wrap;
     }
 
-    .add-qna {
-      margin-top: 30px;
-      border-top: 1px solid #ccc;
-      padding-top: 15px;
-      color: black;
-      background: #f3f4f6;
-      border-radius: 10px;
-      padding: 15px;
-    }
-
-    .add-qna input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
-
-    .add-qna button {
+    /* ===== Shortcut Buttons ===== */
+    .shortcuts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-top: 10px;
-      width: 100%;
-      background: #10B981;
     }
 
-    .add-qna button:hover { background: #059669; }
+    .shortcut-btn {
+      background: #10B981;
+      color: white;
+      border-radius: 8px;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+    }
 
-    #imageUpload { margin-top: 15px; }
+    .shortcut-btn:hover { background: #059669; }
+
+    /* ===== Q&A Entries ===== */
+    .qa-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e5e7eb;
+      padding: 8px;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+
+    .qa-entry span { flex: 1; }
+
+    .qa-entry button { margin-left: 5px; background: #f87171; color: white; padding: 6px 10px; border-radius: 6px; }
+    .qa-entry button:hover { background: #ef4444; }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .container { width: 100%; }
+      .shortcuts { flex-direction: column; }
+    }
   </style>
 </head>
 
 <body>
-<div class="container">
-  <h1>Appointment AI</h1>
-  <p>Your AI helper is ready to assist with appointments.</p>
+  <div class="container">
+    <h1>Appointment AI</h1>
 
-  <!-- Text input -->
-  <input type="text" id="userInput" placeholder="Type customer message here..." />
-  <br>
-  <button onclick="handleSubmit()">Submit</button>
+    <!-- Output Display -->
+    <div id="output">Response will appear here...</div>
 
-  <!-- Screenshot input -->
-  <input type="file" id="imageUpload" accept="image/*">
-  <button onclick="handleImage()">Upload Screenshot</button>
+    <!-- Input Section -->
+    <div class="panel">
+      <input type="text" id="userInput" placeholder="Type customer message here..." />
+      <button onclick="handleSubmit()">Submit</button>
 
-  <div id="output">Response will appear here...</div>
+      <input type="file" id="imageUpload" accept="image/*">
+      <button onclick="handleImage()">Upload Screenshot</button>
 
-  <!-- Add Q&A Panel -->
-  <div class="add-qna">
-    <h3>Add New Question & Answer</h3>
-    <input type="text" class="new-q" placeholder="Enter keyword(s), comma separated" />
-    <input type="text" class="new-a" placeholder="Enter the answer" />
-    <button id="add-qna-btn">Add Q&A</button>
+      <!-- Shortcut buttons -->
+      <div class="shortcuts">
+        <button class="shortcut-btn" onclick="quickReply('too expensive')">Too Expensive</button>
+        <button class="shortcut-btn" onclick="quickReply('already have marketing')">Already Have Marketing</button>
+        <button class="shortcut-btn" onclick="quickReply('busy call later')">Busy / Call Later</button>
+        <button class="shortcut-btn" onclick="quickReply('not interested')">Not Interested</button>
+      </div>
+    </div>
+
+    <!-- Add Q&A Panel -->
+    <div class="panel">
+      <h3>Add New Q&A</h3>
+      <input type="text" id="newKeywords" placeholder="Enter keywords (comma-separated)">
+      <textarea id="newAnswer" placeholder="Enter the answer"></textarea>
+      <button id="addQBtn">Add Q&A</button>
+    </div>
+
+    <!-- Manage Q&A Panel -->
+    <div class="panel">
+      <h3>Manage Existing Q&A</h3>
+      <div id="qaList"></div>
+    </div>
   </div>
-</div>
 
-<script>
-  // Existing AI knowledge
-  const knowledgeBase = [
-    { keywords: ["price", "cost", "how much"], response: "Our service helps improve your Google visibility and bring more customers. Pricing depends on your business needs, but I can connect you with a specialist to go over options." },
-    { keywords: ["not interested", "no thanks"], response: "Totally understand! Just curious—are you currently getting consistent leads from Google, or is that something you're still looking to improve?" },
-    { keywords: ["busy", "call later"], response: "No problem! When would be a better time for a quick call? It’ll only take a minute." },
-    { keywords: ["what is this", "who are you"], response: "We help local businesses improve their Google presence so they can get more calls and customers. I just wanted to quickly see if this is something you’d be open to." },
-    { keywords: ["already have", "we have marketing"], response: "That’s great! Most of the businesses we work with already have marketing, we just help improve their Google results. Would you be open to seeing if there’s anything we can improve?" },
-    { keywords: ["send info", "email me"], response: "I can definitely send more info, but most business owners prefer a quick call so they can ask questions directly. Would a short call work for you?" }
-  ];
+  <script>
+    // Knowledge base
+    let knowledgeBase = [
+      { keywords: ["price", "cost", "how much"], response: "Our service helps improve your Google visibility. Pricing depends on your needs, but I can connect you with a specialist." },
+      { keywords: ["not interested", "no thanks"], response: "Totally understand! Are you getting consistent leads from Google?" },
+      { keywords: ["busy", "call later"], response: "No problem! When would be a better time for a quick call?" },
+      { keywords: ["what is this", "who are you"], response: "We help local businesses improve their Google presence and get more customers." },
+      { keywords: ["already have", "we have marketing"], response: "That’s great! Most of our clients already have marketing. We just help improve their Google results." },
+      { keywords: ["send info", "email me"], response: "I can send info, but most owners prefer a quick call. Would a short call work?" }
+    ];
 
-  // Function to get AI response
-  function getResponse(input) {
-    input = input.toLowerCase();
-    for (let item of knowledgeBase) {
-      for (let keyword of item.keywords) {
-        if (input.includes(keyword)) {
-          return item.response;
-        }
+    // Display Q&A list
+    function updateQAManage() {
+      const qaList = document.getElementById('qaList');
+      qaList.innerHTML = '';
+      knowledgeBase.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'qa-entry';
+        div.innerHTML = `<span><b>Keywords:</b> ${item.keywords.join(', ')}<br><b>Answer:</b> ${item.response}</span>
+                         <button onclick="editQA(${index})">Edit</button>
+                         <button onclick="deleteQA(${index})">Delete</button>`;
+        qaList.appendChild(div);
+      });
+    }
+
+    function editQA(index) {
+      const newKeywords = prompt("Edit keywords (comma separated):", knowledgeBase[index].keywords.join(', '));
+      const newAnswer = prompt("Edit answer:", knowledgeBase[index].response);
+      if (newKeywords !== null && newAnswer !== null) {
+        knowledgeBase[index].keywords = newKeywords.split(',').map(k => k.trim());
+        knowledgeBase[index].response = newAnswer.trim();
+        updateQAManage();
+        alert("Q&A updated!");
       }
     }
-    return "Got it! Can you tell me a bit more so I can assist you better?";
-  }
 
-  // Handle text input submit
-  function handleSubmit() {
-    const input = document.getElementById("userInput").value;
-    const response = getResponse(input);
-    document.getElementById("output").innerText = response;
-  }
-
-  // Handle Add Q&A panel
-  const addQBtn = document.getElementById('add-qna-btn');
-  const newQ = document.querySelector('.new-q');
-  const newA = document.querySelector('.new-a');
-
-  addQBtn.addEventListener('click', () => {
-    const keywords = newQ.value.trim().toLowerCase().split(",").map(k => k.trim()).filter(k => k);
-    const answer = newA.value.trim();
-    if(keywords.length && answer) {
-      knowledgeBase.push({ keywords, response: answer });
-      newQ.value = '';
-      newA.value = '';
-      alert("New Q&A added!");
-    } else {
-      alert("Please fill both keywords and answer.");
-    }
-  });
-
-  // Handle screenshot upload and OCR
-  function handleImage() {
-    const file = document.getElementById('imageUpload').files[0];
-    if (!file) {
-      alert("Please select an image first.");
-      return;
+    function deleteQA(index) {
+      if (confirm("Are you sure you want to delete this entry?")) {
+        knowledgeBase.splice(index, 1);
+        updateQAManage();
+      }
     }
 
-    document.getElementById('output').innerText = "Reading screenshot...";
-
-    Tesseract.recognize(
-      file,
-      'eng',
-      { logger: m => console.log(m) }
-    ).then(({ data: { text } }) => {
-      const response = getResponse(text);
-      document.getElementById('output').innerText = "Detected text: " + text + "\n\nAI Response: " + response;
-    }).catch(err => {
-      document.getElementById('output').innerText = "Error reading image: " + err;
+    // Add new Q&A
+    document.getElementById('addQBtn').addEventListener('click', () => {
+      const keywords = document.getElementById('newKeywords').value.trim().toLowerCase().split(',').map(k => k.trim()).filter(k => k);
+      const answer = document.getElementById('newAnswer').value.trim();
+      if (keywords.length && answer) {
+        knowledgeBase.push({ keywords, response: answer });
+        document.getElementById('newKeywords').value = '';
+        document.getElementById('newAnswer').value = '';
+        updateQAManage();
+        alert("New Q&A added!");
+      } else { alert("Please fill both keywords and answer."); }
     });
-  }
-</script>
+
+    // AI response
+    function getResponse(input) {
+      input = input.toLowerCase();
+      for (let item of knowledgeBase) {
+        for (let keyword of item.keywords) {
+          if (input.includes(keyword)) return item.response;
+        }
+      }
+      return "Got it! Can you tell me a bit more so I can assist you better?";
+    }
+
+    function handleSubmit() {
+      const input = document.getElementById("userInput").value;
+      document.getElementById("output").innerText = getResponse(input);
+    }
+
+    // Quick shortcut reply
+    function quickReply(keyword) {
+      document.getElementById("output").innerText = getResponse(keyword);
+    }
+
+    // Screenshot OCR
+    function handleImage() {
+      const file = document.getElementById('imageUpload').files[0];
+      if (!file) { alert("Please select an image first."); return; }
+      document.getElementById('output').innerText = "Reading screenshot...";
+      Tesseract.recognize(file, 'eng', { logger: m => console.log(m) })
+        .then(({ data: { text } }) => {
+          const response = getResponse(text);
+          document.getElementById('output').innerText = "Detected text: " + text + "\n\nAI Response: " + response;
+        })
+        .catch(err => { document.getElementById('output').innerText = "Error reading image: " + err; });
+    }
+
+    // Initialize
+    updateQAManage();
+  </script>
 </body>
-</html>
