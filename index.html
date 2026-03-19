@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Appointment AI Assistant</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -51,71 +50,107 @@
       border-radius: 10px;
       min-height: 60px;
     }
+
+    /* Add Q&A panel styles */
+    .add-qna {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 15px;
+      color: black;
+      background: #f3f4f6;
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .add-qna input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .add-qna button {
+      margin-top: 10px;
+      width: 100%;
+      background: #10B981;
+    }
+
+    .add-qna button:hover {
+      background: #059669;
+    }
   </style>
 </head>
-
 <body>
 
-  <div class="container">
-    <h1>Appointment AI</h1>
-    <p>Your AI helper is ready to assist with appointments.</p>
+<div class="container">
+  <h1>Appointment AI</h1>
+  <p>Your AI helper is ready to assist with appointments.</p>
 
-    <input type="text" id="userInput" placeholder="Type customer message here..." />
-    <br>
-    <button onclick="handleSubmit()">Submit</button>
+  <input type="text" id="userInput" placeholder="Type customer message here..." />
+  <br>
+  <button onclick="handleSubmit()">Submit</button>
 
-    <div id="output">Response will appear here...</div>
+  <div id="output">Response will appear here...</div>
+
+  <!-- Add Q&A Panel -->
+  <div class="add-qna">
+    <h3>Add New Question & Answer</h3>
+    <input type="text" class="new-q" placeholder="Enter keyword(s), comma separated" />
+    <input type="text" class="new-a" placeholder="Enter the answer" />
+    <button id="add-qna-btn">Add Q&A</button>
   </div>
+</div>
 
-  <script>
-    const knowledgeBase = [
-      {
-        keywords: ["price", "cost", "how much"],
-        response: "Our service helps improve your Google visibility and bring more customers. Pricing depends on your business needs, but I can connect you with a specialist to go over options."
-      },
-      {
-        keywords: ["not interested", "no thanks"],
-        response: "Totally understand! Just curious—are you currently getting consistent leads from Google, or is that something you're still looking to improve?"
-      },
-      {
-        keywords: ["busy", "call later"],
-        response: "No problem! When would be a better time for a quick call? It’ll only take a minute."
-      },
-      {
-        keywords: ["what is this", "who are you"],
-        response: "We help local businesses improve their Google presence so they can get more calls and customers. I just wanted to quickly see if this is something you’d be open to."
-      },
-      {
-        keywords: ["already have", "we have marketing"],
-        response: "That’s great! Most of the businesses we work with already have marketing, we just help improve their Google results. Would you be open to seeing if there’s anything we can improve?"
-      },
-      {
-        keywords: ["send info", "email me"],
-        response: "I can definitely send more info, but most business owners prefer a quick call so they can ask questions directly. Would a short call work for you?"
-      }
-    ];
+<script>
+  // Existing AI knowledge
+  const knowledgeBase = [
+    { keywords: ["price", "cost", "how much"], response: "Our service helps improve your Google visibility and bring more customers. Pricing depends on your business needs, but I can connect you with a specialist to go over options." },
+    { keywords: ["not interested", "no thanks"], response: "Totally understand! Just curious—are you currently getting consistent leads from Google, or is that something you're still looking to improve?" },
+    { keywords: ["busy", "call later"], response: "No problem! When would be a better time for a quick call? It’ll only take a minute." },
+    { keywords: ["what is this", "who are you"], response: "We help local businesses improve their Google presence so they can get more calls and customers. I just wanted to quickly see if this is something you’d be open to." },
+    { keywords: ["already have", "we have marketing"], response: "That’s great! Most of the businesses we work with already have marketing, we just help improve their Google results. Would you be open to seeing if there’s anything we can improve?" },
+    { keywords: ["send info", "email me"], response: "I can definitely send more info, but most business owners prefer a quick call so they can ask questions directly. Would a short call work for you?" }
+  ];
 
-    function getResponse(input) {
-      input = input.toLowerCase();
-
-      for (let item of knowledgeBase) {
-        for (let keyword of item.keywords) {
-          if (input.includes(keyword)) {
-            return item.response;
-          }
+  // Function to get AI response
+  function getResponse(input) {
+    input = input.toLowerCase();
+    for (let item of knowledgeBase) {
+      for (let keyword of item.keywords) {
+        if (input.includes(keyword)) {
+          return item.response;
         }
       }
-
-      return "Got it! Can you tell me a bit more so I can assist you better?";
     }
+    return "Got it! Can you tell me a bit more so I can assist you better?";
+  }
 
-    function handleSubmit() {
-      const input = document.getElementById("userInput").value;
-      const response = getResponse(input);
+  // Handle submit
+  function handleSubmit() {
+    const input = document.getElementById("userInput").value;
+    const response = getResponse(input);
+    document.getElementById("output").innerText = response;
+  }
 
-      document.getElementById("output").innerText = response;
+  // Add Q&A dynamically from panel
+  const addQBtn = document.getElementById('add-qna-btn');
+  const newQ = document.querySelector('.new-q');
+  const newA = document.querySelector('.new-a');
+
+  addQBtn.addEventListener('click', () => {
+    const keywords = newQ.value.trim().toLowerCase().split(",").map(k => k.trim()).filter(k => k);
+    const answer = newA.value.trim();
+    if(keywords.length && answer) {
+      knowledgeBase.push({ keywords, response: answer });
+      newQ.value = '';
+      newA.value = '';
+      alert("New Q&A added!");
+    } else {
+      alert("Please fill both keywords and answer.");
     }
-  </script>
+  });
+</script>
 
 </body>
 </html>
