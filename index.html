@@ -3,8 +3,73 @@
 <head>
     <title>Appointment-AI</title>
 </head>
-<body>
-    <h1>Welcome to Appointment-AI</h1>
-    <p>My First AI Project</p>
+
+<body style="background:#121212; color:white; font-family:Arial;">
+
+    <h1 style="text-align:center;">Welcome to Appointment-AI</h1>
+    <p style="text-align:center;">My First AI Project</p>
+
+    <!-- Manual Knowledge Base -->
+    <div style="margin:20px; padding:20px; background:#1e1e1e; border-radius:12px;">
+        <h2 style="text-align:center; color:#4fc3f7;">Manual Knowledge Base</h2>
+
+        <div id="notesContainer" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+
+        <div id="qaSection" style="margin-top:20px;"></div>
+
+        <div style="text-align:center; margin-top:15px;">
+            <button onclick="addNote()">Add Note</button>
+            <button onclick="deleteNote()">Delete Last Note</button>
+            <button onclick="addQA()">Add Q&A</button>
+        </div>
+    </div>
+
+<script>
+const notesContainer = document.getElementById('notesContainer');
+const qaSection = document.getElementById('qaSection');
+const colors = ['#ff6b6b','#4ecdc4','#ffe66d','#95e1d3'];
+
+function addNote(){
+    const note = document.createElement('div');
+    note.contentEditable = true;
+    note.innerText = "Type here...";
+    note.style = `
+        width:150px;
+        height:120px;
+        padding:10px;
+        font-weight:bold;
+        border-radius:10px;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        color:black;
+    `;
+    notesContainer.appendChild(note);
+}
+
+function deleteNote(){
+    const notes = notesContainer.children;
+    if(notes.length > 0){
+        notesContainer.removeChild(notes[notes.length - 1]);
+    }
+}
+
+function addQA(){
+    const q = prompt("Enter Question:");
+    const a = prompt("Enter Answer:");
+
+    if(q && a){
+        const question = document.createElement('div');
+        question.innerHTML = "<b>Q:</b> " + q;
+        question.style = "margin-top:10px; color:#4fc3f7; font-weight:bold;";
+
+        const answer = document.createElement('div');
+        answer.innerHTML = "<b>A:</b> " + a;
+        answer.style = "margin-bottom:10px; color:#ffb74d;";
+
+        qaSection.appendChild(question);
+        qaSection.appendChild(answer);
+    }
+}
+</script>
+
 </body>
 </html>
