@@ -4,43 +4,53 @@
     <title>Appointment-AI</title>
 </head>
 
-<body style="background:#121212; color:white; font-family:Arial;">
+<body style="margin:0; font-family:Arial; background:#0f172a; color:white;">
 
-    <h1 style="text-align:center;">Welcome to Appointment-AI</h1>
-    <p style="text-align:center;">My First AI Project</p>
+    <!-- HEADER -->
+    <div style="padding:20px; text-align:center; background:#020617;">
+        <h1 style="margin:0; color:#38bdf8;">Appointment-AI</h1>
+        <p style="margin:5px; color:#94a3b8;">Smart Knowledge Base Tool</p>
+    </div>
 
-    <!-- Manual Knowledge Base -->
-    <div style="margin:20px; padding:20px; background:#1e1e1e; border-radius:12px;">
-        <h2 style="text-align:center; color:#4fc3f7;">Manual Knowledge Base</h2>
+    <!-- MAIN CONTAINER -->
+    <div style="padding:20px; max-width:1000px; margin:auto;">
 
-        <div id="notesContainer" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-
-        <div id="qaSection" style="margin-top:20px;"></div>
-
-        <div style="text-align:center; margin-top:15px;">
-            <button onclick="addNote()">Add Note</button>
-            <button onclick="deleteNote()">Delete Last Note</button>
-            <button onclick="addQA()">Add Q&A</button>
+        <!-- BUTTONS -->
+        <div style="text-align:center; margin-bottom:20px;">
+            <button onclick="addNote()" style="padding:10px 20px; margin:5px; background:#38bdf8; border:none; border-radius:6px; font-weight:bold;">Add Note</button>
+            <button onclick="deleteNote()" style="padding:10px 20px; margin:5px; background:#f87171; border:none; border-radius:6px; font-weight:bold;">Delete</button>
+            <button onclick="addQA()" style="padding:10px 20px; margin:5px; background:#4ade80; border:none; border-radius:6px; font-weight:bold;">Add Q&A</button>
         </div>
+
+        <!-- NOTES -->
+        <h2 style="color:#38bdf8;">Notes</h2>
+        <div id="notesContainer" style="display:flex; flex-wrap:wrap; gap:15px;"></div>
+
+        <!-- QA -->
+        <h2 style="color:#4ade80; margin-top:30px;">Questions & Answers</h2>
+        <div id="qaSection"></div>
+
     </div>
 
 <script>
 const notesContainer = document.getElementById('notesContainer');
 const qaSection = document.getElementById('qaSection');
-const colors = ['#ff6b6b','#4ecdc4','#ffe66d','#95e1d3'];
+
+const colors = ['#38bdf8','#facc15','#f87171','#4ade80','#a78bfa'];
 
 function addNote(){
     const note = document.createElement('div');
     note.contentEditable = true;
     note.innerText = "Type here...";
     note.style = `
-        width:150px;
-        height:120px;
-        padding:10px;
-        font-weight:bold;
+        width:180px;
+        height:130px;
+        padding:12px;
         border-radius:10px;
+        font-weight:bold;
         background:${colors[Math.floor(Math.random()*colors.length)]};
         color:black;
+        box-shadow:0 4px 10px rgba(0,0,0,0.5);
     `;
     notesContainer.appendChild(note);
 }
@@ -57,16 +67,21 @@ function addQA(){
     const a = prompt("Enter Answer:");
 
     if(q && a){
-        const question = document.createElement('div');
-        question.innerHTML = "<b>Q:</b> " + q;
-        question.style = "margin-top:10px; color:#4fc3f7; font-weight:bold;";
+        const box = document.createElement('div');
+        box.style = `
+            background:#020617;
+            padding:15px;
+            border-radius:10px;
+            margin-top:10px;
+            border-left:5px solid #38bdf8;
+        `;
 
-        const answer = document.createElement('div');
-        answer.innerHTML = "<b>A:</b> " + a;
-        answer.style = "margin-bottom:10px; color:#ffb74d;";
+        box.innerHTML = `
+            <div style="color:#38bdf8; font-weight:bold;">Q: ${q}</div>
+            <div style="color:#facc15; margin-top:5px;">A: ${a}</div>
+        `;
 
-        qaSection.appendChild(question);
-        qaSection.appendChild(answer);
+        qaSection.appendChild(box);
     }
 }
 </script>
